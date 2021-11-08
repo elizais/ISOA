@@ -33,7 +33,7 @@ class WordSorter:
         self.words = words
 
     def __call__(self):
-        list_words = '\n'.join(sorted(list(set(re.split(r'; |, |\*|\n| |\? |\. ', self.words)))))
+        list_words = '\n'.join(sorted(list(set(re.split(r'; |, |\*|\n| |\? |\. |\?', self.words)))))
         return list_words
 
 

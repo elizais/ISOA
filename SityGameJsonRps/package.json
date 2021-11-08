@@ -1,0 +1,25 @@
+{
+  "name": "sity_game_json_rps",
+  "version": "1.0.0",
+  "description": "City game in a Node.js - json-rpc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Latypova Elizaveta <elizaveta1902@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.4.1",
+    "@grpc/proto-loader": "^0.6.6",
+    "async": "^3.2.1",
+    "express": "^4.17.1",
+    "google-protobuf": "^3.19.0",
+    "grpc": "^1.24.11",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.5",
+    "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  }
+}

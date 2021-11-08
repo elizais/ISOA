@@ -9,6 +9,7 @@ venv.bak/
 
 .idea/
 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -21,3 +22,6 @@ __pypackages__/
 .secrets.*
 
 *.sqlite
+
+# nodeJS
+node_modules/
