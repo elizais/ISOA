@@ -1,9 +1,9 @@
-var grpc = require("grpc");
-var protoLoader = require("@grpc/proto-loader");
+var grpc = require('grpc');
+var protoLoader = require('@grpc/proto-loader');
 var fs = require('fs');
 
 const server = new grpc.Server();
-const SERVER_ADDRESS = "0.0.0.0:5001";
+const SERVER_ADDRESS = '0.0.0.0:5001';
 
 const fileCityList = 'city/cities_list.txt'
 
@@ -23,13 +23,22 @@ let users = [];
 let city;
 let usedNameUsers = [];
 let usedNameCities = [];
-let indexUserStep = 0;
+let indexUserStep;
 let flagStartGame = false;
 let lettersFalse = 'ёьъы'
+let timeInMs = Date.now();
 
 // доделай проверку первой буквы с которой должен начинаться город
 function defineFirstLetter(nameCity){
-    return indexUserStep === 0 || usedNameCities[-1][-1] === nameCity[0];
+    let lneArrUsedCity = usedNameCities.length - 1;
+    if (usedNameCities.length === 0) {
+        return true
+    }
+    else {
+        let i = usedNameCities[lneArrUsedCity].length-1;
+        while (lettersFalse.includes(usedNameCities[lneArrUsedCity][i])){i--;}
+        return usedNameCities[lneArrUsedCity][i] === nameCity[0]
+    }
 }
 
 
@@ -37,6 +46,7 @@ function defineFirstLetter(nameCity){
 function join(call, callback) {
     users.push(call);
     notifyChat({ user: "Server", text: selectFirst()});
+    notifyChat({ user: "Server", text: 'Для начала игры введите play'});
 }
 
 function selectFirst(){
@@ -60,29 +70,42 @@ function getName(call, callback) {
 
 // Receive message from client
 function send(call, callback) {
+    var timeInMs = Date.now();
     if (flagStartGame){
-        if (indexUserStep === 0 || usedNameCities[-1][-1] === call.request.text[0]){// В этот уровень вставить проверку первой буквы с которой начинается город
+        if (defineFirstLetter(call.request.text)){
             if (call.request.user === usedNameUsers[indexUserStep]) {
                 if (city.includes(call.request.text[0].toUpperCase() + call.request.text.slice(1).toLowerCase())){
                     if (usedNameCities.includes(call.request.text)){
-                        notifyChat({user: 'ошибка', text: call.request.user + ' этот город уже называли'})
+                        notifyChat({user: 'Server', text: call.request.user + ' этот город уже называли'})
                     }
                     else{
-                        notifyChat(call.request);
-                        usedNameCities.push(call.request.text);
-                        indexUserStep = (indexUserStep+1)%usedNameUsers.length
+                        if ((Date.now()-timeInMs)/1000 < 10){
+                            notifyChat(call.request);
+                            usedNameCities.push(call.request.text);
+                            indexUserStep = (indexUserStep+1)%usedNameUsers.length
+                            notifyChat({user: 'Server',
+                                text: 'Верно, следующий ходит ' + usedNameUsers[indexUserStep]});
+                        }
+                        else {
+                            notifyChat({user: 'Server',
+                                text: 'Игрок ' + usedNameUsers[indexUserStep] + ' проиграл'});
+                            delete usedNameUsers[indexUserStep];
+                        }
+
+
+                        timeInMs = Date.now()
                     }
                 }
                 else {
-                    notifyChat({user: 'ошибка', text: call.request.user + ' Такого города не сущесьвует'})
+                    notifyChat({user: 'Server', text: call.request.user + ' Такого города не сущесьвует'})
                 }
             }
             else {
-                notifyChat({user: 'ошибка', text: call.request.user + ' мне кажется сейчас ходит ' + usedNameUsers[indexUserStep]})
+                notifyChat({user: 'Server', text: call.request.user + ' мне кажется сейчас ходит ' + usedNameUsers[indexUserStep]})
             }
         }
         else {
-            notifyChat({user: 'ошибка', text: call.request.user + ' с другой буквы должно быть слово'})
+            notifyChat({user: 'Server', text: call.request.user + ' назовите город с другой буквы'})
         }
     }
     else {
@@ -90,9 +113,9 @@ function send(call, callback) {
     }
     if (call.request.text === 'play'){
         flagStartGame = true;
-        notifyChat({user: call.request.user, text: call.request.user + 'начал игру'});
+        notifyChat({user: 'Server', text: call.request.user + 'начал игру'});
+        timeInMs = Date.now()
     }
-
 }
 
 // Send message to all connected clients
@@ -104,6 +127,7 @@ function notifyChat(message) {
 
 // Define server with the methods and start it
 function main() {
+    indexUserStep = 0;
     fs.readFile(fileCityList, 'utf8', function(err, data) {
         if (err) throw err;
         console.log('OK: ' + fileCityList);
