@@ -9,7 +9,7 @@ venv.bak/
 
 .idea/
 
-
+.Development.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -162,7 +162,3 @@ ModelManifest.xml
 Desktop.ini
 .vscode/
 
-**/wwwroot/*
-*.feature.cs
-*.feature.xlsx.*
-*.Specs_*.html

@@ -41,13 +41,16 @@ namespace TodoApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+                app.UseDefaultFiles();
+                app.UseStaticFiles();
 
-            app.UseRouting();
+                app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+                app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
+                app.UseAuthorization();
+
+                app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
