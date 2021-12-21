@@ -1,6 +1,6 @@
-var grpc = require('grpc');
-var protoLoader = require('@grpc/proto-loader');
-var fs = require('fs');
+let grpc = require('grpc');
+let protoLoader = require('@grpc/proto-loader');
+let fs = require('fs');
 
 const server = new grpc.Server();
 const SERVER_ADDRESS = '0.0.0.0:5001';
@@ -19,115 +19,167 @@ let proto = grpc.loadPackageDefinition(
     protoLoader.loadSync("protos/citygame.proto", options)
 );
 
-let users = [];
-let city;
-let usedNameUsers = [];
-let usedNameCities = [];
-let indexUserStep;
-let flagStartGame = false;
-let lettersFalse = 'ёьъы'
-let timeInMs = Date.now();
+class Dictionary extends Map {
+    constructor(){
+        super();
+    }
+    add(id, data){
+        if(this.has(id)){
+            this.get(id).push(data);
+        }else{
+            this.set(id, [data]);
+        }
+        return this;
+    }
+}
 
-// доделай проверку первой буквы с которой должен начинаться город
-function defineFirstLetter(nameCity){
-    let lneArrUsedCity = usedNameCities.length - 1;
-    if (usedNameCities.length === 0) {
-        return true
+let users = [];
+let commands = new Dictionary();
+let itergame = 0;
+let usedNameUsers = new Dictionary();
+let gamesUsers = new Dictionary();
+let city;
+let usedNameCities = new Dictionary();
+let indexUserStep = new Dictionary();
+let flagStartGame = new Dictionary();
+let lettersFalse = 'ёьъы'
+let timeInMs = new Dictionary();
+let callerName;
+
+
+
+function defineFirstLetter(nameCity, idLobby){
+    if (usedNameCities.get(idLobby) === undefined){
+        return true;
+    }
+    let lenArrUsedCity = usedNameCities.get(idLobby).length - 1;
+    if (lenArrUsedCity >= 0) {
+        return true;
+    }
+    let  previous = usedNameCities.get(idLobby)[lenArrUsedCity]
+    let i = previous.length-1;
+    while (lettersFalse.includes(previous[i])){i--;}
+    return previous[i] === nameCity[0].toLowerCase()
+}
+
+function writeCorrectAnswer(call){
+    console.log(timeInMs.get(call.request.lobby))
+    if ((Date.now()-timeInMs.get(call.request.lobby))/1000 < 30){
+        notifyChat(call.request);
+        usedNameCities.add(call.request.lobby, call.request.text);
+        indexUserStep.set(call.request.lobby,
+            (indexUserStep.get(call.request.lobby)+1)%usedNameUsers.get(call.request.lobby).length)
+        callerName =  usedNameUsers.get(call.request.lobby)[indexUserStep.get(call.request.lobby)]
+        notifyChat({user: 'Server',
+            text: 'Верно, следующий ходит ' + callerName,
+            lobby: call.request.lobby
+        });
     }
     else {
-        let i = usedNameCities[lneArrUsedCity].length-1;
-        while (lettersFalse.includes(usedNameCities[lneArrUsedCity][i])){i--;}
-        return usedNameCities[lneArrUsedCity][i] === nameCity[0]
+        sendServerMessage(call, 'Игрок ' + callerName + ' проиграл');
+        usedNameUsers.get(call.request.lobby).splice(indexUserStep.get(call.request.lobby) , 1);
     }
+    timeInMs.set(call.request.lobby, Date.now())
+}
+
+function sendServerMessage(call, masage){
+    notifyChat({user: 'Server',
+        text: masage,
+        lobby: call.request.lobby});
 }
 
 
 // Receive message from client joining
 function join(call, callback) {
-    users.push(call);
-    notifyChat({ user: "Server", text: selectFirst()});
-    notifyChat({ user: "Server", text: 'Для начала игры введите play'});
+    gamesUsers.add(itergame, call);
+    notifyChat({ user: "Server", text: selectFirst(call), lobby: itergame});
+    notifyChat({ user: "Server", text: 'Для начала игры введите play', lobby: itergame});
 }
 
-function selectFirst(){
-    if (usedNameUsers.length === 0){
-        return "вы первый участник"
+function selectFirst(call){
+    if (gamesUsers.get(itergame).length === 1){
+        return " вы первый участник"
     }
-    return usedNameUsers[indexUserStep] + " начинает игру"
+    return usedNameUsers.get(itergame)[0] + " начинает игру"
 }
 
 // Receive message from client
 function getName(call, callback) {
-    if (usedNameUsers.includes(call.request.user))    {
-        callback(null, {user: call.request.name, text: 'ask name again'})
+    if (gamesUsers.get(call.request.lobby) !== undefined){
+        if (usedNameUsers.get(call.request.lobby).includes(call.request.user)){
+            callback(null, {user: call.request.user, text: 'ask name again', lobby: itergame})
+        }
+        else {
+            callback(null, {user: call.request.user, text: 'Grate', lobby: itergame});
+            usedNameUsers.add(call.request.lobby, call.request.user);
+            console.log(usedNameUsers.get(call.request.lobby))
+        }
     }
     else {
-        usedNameUsers.push(call.request.user);
-        console.log(usedNameUsers);
+        callback(null, {user: call.request.user, text: 'Grate', lobby: itergame});
+        usedNameUsers.add(call.request.lobby, call.request.user);
+        console.log(usedNameUsers.get(call.request.lobby))
     }
 
 }
 
 // Receive message from client
 function send(call, callback) {
-    var timeInMs = Date.now();
-    if (flagStartGame){
+    callerName = usedNameUsers.get(call.request.lobby)[indexUserStep.get(call.request.lobby)]
+    if (flagStartGame.get(call.request.lobby)){
         if (defineFirstLetter(call.request.text)){
-            if (call.request.user === usedNameUsers[indexUserStep]) {
+            if (call.request.user === callerName) {
                 if (city.includes(call.request.text[0].toUpperCase() + call.request.text.slice(1).toLowerCase())){
-                    if (usedNameCities.includes(call.request.text)){
-                        notifyChat({user: 'Server', text: call.request.user + ' этот город уже называли'})
+                    if (usedNameCities.get(call.request.lobby) === undefined) {
+                        writeCorrectAnswer(call)
                     }
                     else{
-                        if ((Date.now()-timeInMs)/1000 < 10){
-                            notifyChat(call.request);
-                            usedNameCities.push(call.request.text);
-                            indexUserStep = (indexUserStep+1)%usedNameUsers.length
-                            notifyChat({user: 'Server',
-                                text: 'Верно, следующий ходит ' + usedNameUsers[indexUserStep]});
+                        if (usedNameCities.get(call.request.lobby).includes(call.request.text)){
+                            sendServerMessage(call,call.request.user + ' этот город уже называли');
                         }
-                        else {
-                            notifyChat({user: 'Server',
-                                text: 'Игрок ' + usedNameUsers[indexUserStep] + ' проиграл'});
-                            delete usedNameUsers[indexUserStep];
+                        else{
+                            writeCorrectAnswer(call)
                         }
-
-
-                        timeInMs = Date.now()
                     }
                 }
                 else {
-                    notifyChat({user: 'Server', text: call.request.user + ' Такого города не сущесьвует'})
+                    sendServerMessage(call,call.request.user + ' Такого города не сущесьвует');
                 }
             }
             else {
-                notifyChat({user: 'Server', text: call.request.user + ' мне кажется сейчас ходит ' + usedNameUsers[indexUserStep]})
+                sendServerMessage(call,call.request.user + ' мне кажется сейчас ходит ' + callerName);
             }
         }
         else {
-            notifyChat({user: 'Server', text: call.request.user + ' назовите город с другой буквы'})
+            sendServerMessage(call,call.request.user + ' назовите город с другой буквы');
         }
     }
     else {
         notifyChat(call.request);
     }
     if (call.request.text === 'play'){
-        flagStartGame = true;
-        notifyChat({user: 'Server', text: call.request.user + 'начал игру'});
-        timeInMs = Date.now()
+        flagStartGame.add(call.request.lobby, true);
+        sendServerMessage(call,call.request.user+' начал игру для команды '+usedNameUsers.get(call.request.lobby));
+        if (!(call.request.lobby in commands)){
+            commands.add(call.request.lobby, users)
+            itergame++;
+            users.splice(0, users.length)
+            indexUserStep.add(call.request.lobby, 0)
+        }
+        timeInMs.set(call.request.lobby, Date.now())
+
     }
 }
 
 // Send message to all connected clients
 function notifyChat(message) {
-    users.forEach(user => {
+    gamesUsers.get(message.lobby).forEach(user => {
         user.write(message);
     });
 }
 
 // Define server with the methods and start it
 function main() {
-    indexUserStep = 0;
     fs.readFile(fileCityList, 'utf8', function(err, data) {
         if (err) throw err;
         console.log('OK: ' + fileCityList);

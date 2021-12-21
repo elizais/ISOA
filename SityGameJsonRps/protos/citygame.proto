@@ -11,4 +11,5 @@ service Game {
 message Message {
   string user = 1;
   string text = 2;
+  int32 lobby = 3;
 }
