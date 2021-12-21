@@ -76,8 +76,15 @@ function writeCorrectAnswer(call){
         });
     }
     else {
-        sendServerMessage(call, 'Игрок ' + callerName + ' проиграл');
-        usedNameUsers.get(call.request.lobby).splice(indexUserStep.get(call.request.lobby) , 1);
+        if (usedNameUsers.get(call.request.lobby).length === 1) {
+            sendServerMessage(call, 'Игрок ' + callerName + ' победил');
+        }
+
+        else{
+            sendServerMessage(call, 'Игрок ' + callerName + ' проиграл');
+            usedNameUsers.get(call.request.lobby).splice(indexUserStep.get(call.request.lobby) , 1);
+        }
+
     }
     timeInMs.set(call.request.lobby, Date.now())
 }
@@ -111,14 +118,14 @@ function getName(call, callback) {
         }
         else {
             callback(null, {user: call.request.user, text: 'Grate', lobby: itergame});
-            usedNameUsers.add(call.request.lobby, call.request.user);
-            console.log(usedNameUsers.get(call.request.lobby))
+            usedNameUsers.add(itergame, call.request.user);
+            console.log(usedNameUsers)
         }
     }
     else {
         callback(null, {user: call.request.user, text: 'Grate', lobby: itergame});
-        usedNameUsers.add(call.request.lobby, call.request.user);
-        console.log(usedNameUsers.get(call.request.lobby))
+        usedNameUsers.add(itergame, call.request.user);
+        console.log(usedNameUsers)
     }
 
 }
@@ -165,6 +172,7 @@ function send(call, callback) {
             itergame++;
             users.splice(0, users.length)
             indexUserStep.add(call.request.lobby, 0)
+            console.log(commands)
         }
         timeInMs.set(call.request.lobby, Date.now())
 
