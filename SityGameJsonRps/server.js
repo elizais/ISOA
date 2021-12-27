@@ -83,6 +83,10 @@ function writeCorrectAnswer(call){
         else{
             sendServerMessage(call, 'Игрок ' + callerName + ' проиграл');
             usedNameUsers.get(call.request.lobby).splice(indexUserStep.get(call.request.lobby) , 1);
+            callerName =  usedNameUsers.get(call.request.lobby)[indexUserStep.get(call.request.lobby)%usedNameUsers.get(call.request.lobby).length]
+            indexUserStep.set(call.request.lobby, indexUserStep.get(call.request.lobby)%usedNameUsers.get(call.request.lobby).length)
+            sendServerMessage(call, 'Игрок ' + callerName + ' ходит');
+
         }
 
     }
