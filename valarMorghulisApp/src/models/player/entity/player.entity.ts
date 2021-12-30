@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { PlayerClass } from '../../enum/playerClass';
+import { PlayerClass } from '../../../enum/playerClass';
 import { LocationEntity } from '../../lacation/entity/location.entity';
 
 @Entity()
@@ -41,4 +41,7 @@ export class PlayerEntity {
   @OneToOne(() => LocationEntity)
   @JoinColumn()
   position: LocationEntity;
+
+  @Column()
+  password: string;
 }

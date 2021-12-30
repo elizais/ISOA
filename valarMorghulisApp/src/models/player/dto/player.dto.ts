@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsString, ValidateNested } from 'class-validator';
-import { PlayerClass } from '../../enum/playerClass';
+import { PlayerClass } from '../../../enum/playerClass';
 import { LocationDto } from '../../lacation/dto/location.dto';
 
 export class PlayerDto {

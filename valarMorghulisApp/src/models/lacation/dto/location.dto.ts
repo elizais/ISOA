@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { LocationType } from '../../enum/locationType';
+import { LocationType } from '../../../enum/locationType';
 
 export class LocationDto {
   @IsNumber()

@@ -18,4 +18,13 @@ export class PlayerService {
   findAll(): Promise<PlayerDto[]> {
     return this.playerRepository.find();
   }
+
+  findOne(id: string): Promise<PlayerDto> {
+    return this.playerRepository.findOne(id);
+  }
+
+  update(id: string, player: PlayerDto): Promise<PlayerDto> {
+    const updatePlayer = this.playerRepository.findBy;
+    return this.playerRepository.up;
+  }
 }
