@@ -5,7 +5,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PlayerEntity } from '../../player/entity/player.entity';
+import { PlayerEntity } from '../../player';
 
 @Entity()
 export class MessagesEntity {

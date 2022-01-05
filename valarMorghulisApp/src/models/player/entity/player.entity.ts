@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { PlayerClass } from '../../../enum/playerClass';
-import { LocationEntity } from '../../lacation/entity/location.entity';
+import { PlayerClass } from '../../../enum';
+import { LocationEntity } from '../../lacation';
 
 @Entity()
 export class PlayerEntity {
@@ -17,6 +17,7 @@ export class PlayerEntity {
   @Column({
     length: 100,
     nullable: false,
+    unique: true,
   })
   name: string;
 
@@ -42,6 +43,8 @@ export class PlayerEntity {
   @JoinColumn()
   position: LocationEntity;
 
-  @Column()
+  @Column({
+    nullable: false,
+  })
   password: string;
 }

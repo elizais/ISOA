@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -6,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { ItemTypeEntity } from './itemType.entity';
-import { PlayerEntity } from '../../player/entity/player.entity';
+import { PlayerEntity } from '../../player';
+import { ItemTypeEntity } from './';
 
 @Entity()
 export class ItemEntity {
@@ -17,6 +18,9 @@ export class ItemEntity {
   @ManyToOne(() => ItemTypeEntity)
   @JoinColumn()
   itemType: ItemTypeEntity;
+
+  @Column()
+  quality: number;
 
   @OneToOne(() => PlayerEntity)
   @JoinColumn()

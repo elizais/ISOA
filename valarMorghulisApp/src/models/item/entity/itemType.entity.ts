@@ -7,6 +7,8 @@ export class ItemTypeEntity {
 
   @Column({
     length: 100,
+    nullable: false,
+    unique: true,
   })
   name: string;
 }

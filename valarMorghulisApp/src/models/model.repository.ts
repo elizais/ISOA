@@ -1,15 +1,13 @@
-import { plainToClass } from 'class-transformer';
 import { DeepPartial, Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { ModelEntity } from '../common';
 
-export class ModelRepository<T, K extends ModelEntity> extends Repository<T> {
+export class ModelRepository<T> extends Repository<T> {
   async get(
-    id: string,
+    id: number,
     relations: string[] = [],
     throwsException = false,
-  ): Promise<K | null> {
+  ): Promise<T | null> {
     return await this.findOne({
       where: { id },
       relations,
@@ -19,7 +17,7 @@ export class ModelRepository<T, K extends ModelEntity> extends Repository<T> {
           return Promise.reject(new NotFoundException('Model not found.'));
         }
 
-        return Promise.resolve(entity ? this.transform(entity) : null);
+        return Promise.resolve(entity ?? null);
       })
       .catch((error) => Promise.reject(error));
   }
@@ -27,27 +25,25 @@ export class ModelRepository<T, K extends ModelEntity> extends Repository<T> {
   async createEntity(
     inputs: DeepPartial<T>,
     relations: string[] = [],
-  ): Promise<K> {
+  ): Promise<T> {
     return this.save(inputs)
       .then(async (entity) => await this.get((entity as any).id, relations))
       .catch((error) => Promise.reject(error));
   }
 
   async updateEntity(
-    entity: K,
+    id: number,
     inputs: QueryDeepPartialEntity<T>,
     relations: string[] = [],
-  ): Promise<K> {
-    return this.update(entity.id, inputs)
-      .then(async () => await this.get(entity.id, relations))
+  ): Promise<T> {
+    return this.update(id, inputs)
+      .then(async () => await this.get(id, relations))
       .catch((error) => Promise.reject(error));
   }
 
-  transform(model: T, transformOptions = {}): K {
-    return plainToClass(ModelEntity, model, transformOptions) as K;
-  }
-
-  transformMany(models: T[], transformOptions = {}): K[] {
-    return models.map((model) => this.transform(model, transformOptions));
+  async updateDescription(name: string, input: DeepPartial<T>): Promise<T> {
+    return this.update(name, input)
+      .then(async () => await this.findOne(name))
+      .catch((error) => Promise.reject(error));
   }
 }
