@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { PlayerDto } from '../dto/';
+import { PlayerDto } from '../dto';
 import { PlayerService } from '../service';
 import { PlayerEntity } from '../entity';
 

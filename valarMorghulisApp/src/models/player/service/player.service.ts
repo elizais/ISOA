@@ -12,7 +12,7 @@ export class PlayerService {
     private playerRepository: ModelRepository<PlayerEntity>,
   ) {}
 
-  create(palyer: PlayerDto): Promise<PlayerDto> {
+  create(palyer: PlayerEntity): Promise<PlayerDto> {
     return this.playerRepository.createEntity(palyer);
   }
 
