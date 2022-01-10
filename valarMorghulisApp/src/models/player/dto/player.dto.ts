@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { PlayerClass } from '../../../enum';
+import { PlayerClassEnum, Role } from '../../../enums';
 import { LocationDto } from '../../lacation';
 
 export class PlayerDto {
@@ -18,9 +18,9 @@ export class PlayerDto {
   @IsNotEmpty()
   name: string;
 
-  @IsEnum(PlayerClass)
+  @IsEnum(PlayerClassEnum)
   @IsNotEmpty()
-  playerClass: PlayerClass;
+  playerClass: PlayerClassEnum;
 
   @IsString()
   @IsEmail()
@@ -41,13 +41,62 @@ export class PlayerDtoGetMessage {
   @IsNotEmpty()
   name: string;
 
-  @IsEnum(PlayerClass)
+  @IsEnum(PlayerClassEnum)
   @IsNotEmpty()
-  playerClass: PlayerClass;
+  playerClass: PlayerClassEnum;
 
   @IsNumber()
   @IsNotEmpty()
   level: number;
+}
+
+export class PlayerDtoRegistration {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(PlayerClassEnum)
+  @IsNotEmpty()
+  playerClass: PlayerClassEnum;
+
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+
+export class PlayerDtoRole {
+  @IsNumber()
+  id: number;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(PlayerClassEnum)
+  @IsNotEmpty()
+  playerClass: PlayerClassEnum;
+
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  level: number;
+
+  @ValidateNested()
+  @IsOptional()
+  position: LocationDto;
+
+  @IsEnum(Role)
+  @IsNotEmpty()
+  roles: Role;
 }
 
 // @ValidateNested({ each: true }) - вложенный

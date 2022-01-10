@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { PlayerDto } from '../dto';
+import { PlayerDto, PlayerDtoRegistration } from '../dto';
 import { PlayerEntity } from '../entity';
 import { ModelRepository } from '../../model.repository';
 
@@ -12,7 +12,7 @@ export class PlayerService {
     private playerRepository: ModelRepository<PlayerEntity>,
   ) {}
 
-  create(palyer: PlayerEntity): Promise<PlayerDto> {
+  create(palyer: PlayerDtoRegistration): Promise<PlayerDto> {
     return this.playerRepository.createEntity(palyer);
   }
 
@@ -21,11 +21,36 @@ export class PlayerService {
   }
 
   findById(id: number): Promise<PlayerDto> {
-    return this.playerRepository.findOne(id);
+    try {
+      return this.playerRepository.findOne(id);
+    } catch (error) {
+      throw new HttpException(
+        'Player with this id does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   findByName(name: string): Promise<PlayerDto> {
-    return this.playerRepository.findOne(name);
+    try {
+      return this.playerRepository.findOne(name);
+    } catch (error) {
+      throw new HttpException(
+        'Player with this name does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  findByEmail(email: string): Promise<PlayerEntity> {
+    try {
+      return this.playerRepository.findOne(email);
+    } catch (error) {
+      throw new HttpException(
+        'Player with this email does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   update(id, inputs: PlayerEntity): Promise<PlayerDto> {

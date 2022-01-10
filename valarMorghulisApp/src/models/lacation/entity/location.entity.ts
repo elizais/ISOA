@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { LocationType } from '../../../enum';
+import { LocationTypeEnum } from '../../../enums';
 
 @Entity()
 export class LocationEntity {
@@ -21,8 +21,8 @@ export class LocationEntity {
 
   @Column({
     type: 'enum',
-    enum: LocationType,
+    enum: LocationTypeEnum,
     nullable: false,
   })
-  locationType: LocationType;
+  locationType: LocationTypeEnum;
 }

@@ -1,4 +1,4 @@
-export enum LocationType {
+export enum LocationTypeEnum {
   Forest = 'Forest',
   Desert = 'Desert',
   Dungeon = 'Dungeon',

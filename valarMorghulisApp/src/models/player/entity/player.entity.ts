@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { PlayerClass } from '../../../enum';
+import { PlayerClassEnum } from '../../../enums';
 import { LocationEntity } from '../../lacation';
+import { Role } from '../../../enums/role.enum';
 
 @Entity()
 export class PlayerEntity {
@@ -23,10 +24,10 @@ export class PlayerEntity {
 
   @Column({
     type: 'enum',
-    enum: PlayerClass,
+    enum: PlayerClassEnum,
     nullable: false,
   })
-  playerClass: PlayerClass;
+  playerClass: PlayerClassEnum;
 
   @Column({
     length: 100,
@@ -36,6 +37,7 @@ export class PlayerEntity {
 
   @Column({
     nullable: false,
+    default: 1,
   })
   level: number;
 
@@ -47,4 +49,11 @@ export class PlayerEntity {
     nullable: false,
   })
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.User,
+  })
+  roles: Role;
 }

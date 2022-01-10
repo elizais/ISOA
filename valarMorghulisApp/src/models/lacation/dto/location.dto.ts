@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { LocationType } from '../../../enum';
+import { LocationTypeEnum } from '../../../enums';
 
 export class LocationDto {
   @IsNumber()
@@ -19,9 +19,9 @@ export class LocationDto {
   @IsOptional()
   description: string;
 
-  @IsEnum(LocationType)
+  @IsEnum(LocationTypeEnum)
   @IsNotEmpty()
-  locationType: LocationType;
+  locationType: LocationTypeEnum;
 }
 
 export class LocationDtoUpdate {
