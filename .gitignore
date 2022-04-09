@@ -10,8 +10,9 @@ venv.bak/
 .idea/
 
 .Development.json
+__pycache__/
 
-
+__pypackages__/
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
