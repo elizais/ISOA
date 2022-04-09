@@ -52,7 +52,7 @@ def apriori_result(
         min_lift=min_lift))
 
 
-def apriori_experiment(
+def apriori_experiment_with_different_min_supports(
         dataset: pd.DataFrame,
         min_supports: list[float],
         min_length: int,
@@ -66,6 +66,33 @@ def apriori_experiment(
     length_result = []
 
     for min_support in min_supports:
+        t0 = time.time()
+        result = apriori_result(transactions, min_support, min_length, min_confidence, min_lift)
+        print(len(result))
+        t1 = time.time()
+        print("Time elapsed: ", t1 - t0)
+        elapsed_time.append(t1 - t0)
+        length_result.append(len(result))
+
+    print(elapsed_time)
+    print(length_result)
+
+    return elapsed_time, length_result
+
+def apriori_experiment_with_different_min_confidences(
+        dataset: pd.DataFrame,
+        min_support: float,
+        min_length: int,
+        min_confidences: list[float],
+        min_lift: int,
+        transactions_length: int
+) -> tuple[list[float], list[int]]:
+    transactions = apriori_dataset_formation(dataset, transactions_length)
+
+    elapsed_time = []
+    length_result = []
+
+    for min_confidence in min_confidences:
         t0 = time.time()
         result = apriori_result(transactions, min_support, min_length, min_confidence, min_lift)
         print(len(result))
@@ -95,15 +122,20 @@ def apriori_normal_output(result: list[tuple]) -> list[list]:
     return apriori_output
 
 
-def apriori_plots_result(min_supports: list[float], elapsed_time: list[float], length_result: list[int]):
-    # Построение графиков времени работы при разных знаечниях поддержки
-    plt.bar([str(min_support) for min_support in min_supports], elapsed_time)
-    plt.xlabel("Значение поддержки")
+def apriori_plots_result(
+        defined_parameter: list[float],
+        elapsed_time: list[float],
+        length_result: list[int],
+        name_experiments: str,
+):
+    # Построение графиков времени работы при разных знаечниях исследуемого параметра
+    plt.bar([str(min_support) for min_support in defined_parameter], elapsed_time)
+    plt.xlabel(name_experiments)
     plt.ylabel("Время работы")
     plt.show()
 
-    # График количества наборов при заданном значении задержки
-    plt.bar([str(min_support) for min_support in min_supports], length_result)
-    plt.xlabel("Значение поддержки")
+    # График количества наборов при заданном значении исследуемого параметра
+    plt.bar([str(min_support) for min_support in defined_parameter], length_result)
+    plt.xlabel(name_experiments)
     plt.ylabel("Количество наборов")
     plt.show()
