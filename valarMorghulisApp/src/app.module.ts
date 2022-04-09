@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
+  AuthenticationModule,
   ItemModule,
   LocationModule,
   MessagesModule,
   PlayerModule,
 } from './models';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from '@hapi/joi';
 
@@ -15,17 +15,13 @@ import * as Joi from '@hapi/joi';
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        POSTGRES_HOST: Joi.string().required(),
-        POSTGRES_PORT: Joi.number().required(),
-        POSTGRES_USER: Joi.string().required(),
-        POSTGRES_PASSWORD: Joi.string().required(),
-        POSTGRES_DB: Joi.string().required(),
-        JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
         PORT: Joi.number(),
       }),
     }),
-    TypeOrmModule.forRoot(),
+    // TypeOrmModule.forRoot(),
+    AuthenticationModule,
     PlayerModule,
     LocationModule,
     ItemModule,
