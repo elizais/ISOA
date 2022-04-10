@@ -1,17 +1,11 @@
-from itertools import combinations
 import pandas as pd
-import numpy as np
 import time
 import matplotlib.pyplot as plt
-
-import json
-import shutil, os
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-from IPython.display import display, HTML
 
 import apyori
 
@@ -78,6 +72,7 @@ def apriori_experiment_with_different_min_supports(
     print(length_result)
 
     return elapsed_time, length_result
+
 
 def apriori_experiment_with_different_min_confidences(
         dataset: pd.DataFrame,
