@@ -12,7 +12,6 @@ import apyori
 
 def apriori_read_dataset(file_name: str, header='infer') -> pd.DataFrame:
     dataset = pd.read_csv(file_name, header=header)
-    print(dataset)
     return dataset
 
 

@@ -71,9 +71,9 @@ def tree_plots_result(
     plt.show()
 
 
-def decision_tree_result(dataset: pd.DataFrame, name_dataset: str):
-    X = dataset.drop(['GRADE'], axis=1)
-    Y = dataset['GRADE']
+def decision_tree_result(dataset: pd.DataFrame, name_dataset: str, name_col_klas: str):
+    X = dataset.drop([name_col_klas], axis=1)
+    Y = dataset[name_col_klas]
 
     test_sizes = [0.10, 0.20, 0.30, 0.40]
 
